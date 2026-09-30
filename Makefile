@@ -1,6 +1,6 @@
 BINARY := bin/secrethawk
 
-.PHONY: build test vet clean
+.PHONY: build test vet fmt fuzz bench clean install
 
 build:
 	mkdir -p bin
@@ -11,6 +11,18 @@ test:
 
 vet:
 	go vet ./...
+
+fmt:
+	gofmt -w cmd internal pkg
+
+fuzz:
+	go test ./internal/scanner -run=^$$ -fuzz=FuzzShannonEntropy -fuzztime=30s
+
+bench:
+	go test ./internal/scanner -run=^$$ -bench=BenchmarkShannonEntropy -benchmem
+
+install:
+	go install ./cmd/secrethawk
 
 clean:
 	rm -rf bin
