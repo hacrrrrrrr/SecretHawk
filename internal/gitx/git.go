@@ -49,6 +49,6 @@ func History(target string) ([]string, error) {
 }
 
 func ShowCommit(target, commit string) ([]byte, error) {
-	cmd := exec.Command("git", "-C", target, "show", "--format=", "--binary", commit)
+	cmd := exec.Command("git", "-C", target, "show", "--format=", "--unified=0", "--binary", commit)
 	return cmd.Output()
 }
