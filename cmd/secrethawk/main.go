@@ -69,8 +69,54 @@ func render(findings []model.Finding, format string, fail bool) {
 }
 
 func usage() {
-	fmt.Println("SecretHawk - source secret scanner")
+	fmt.Println("SecretHawk - fast, extensible secret scanning")
+	fmt.Println("")
 	fmt.Println("Usage:")
-	fmt.Println("  secrethawk scan [path] [--format text|json|sarif]")
-	fmt.Println("  secrethawk git <URL-or-path> [--history] [--format text|json|sarif]")
+	fmt.Println("  secrethawk <command> [options]")
+	fmt.Println("")
+	fmt.Println("Commands:")
+	fmt.Println("  scan       Scan a local file or directory")
+	fmt.Println("  git        Scan a local or remote Git repository")
+	fmt.Println("  version    Print the SecretHawk version")
+	fmt.Println("  help       Show this help message")
+	fmt.Println("")
+	fmt.Println("Global options:")
+	fmt.Println("  -h, --help  Show help")
+	fmt.Println("")
+	fmt.Println("Examples:")
+	fmt.Println("  secrethawk scan .")
+	fmt.Println("  secrethawk scan ./src --format json")
+	fmt.Println("  secrethawk git ./repo")
+	fmt.Println("  secrethawk git https://github.com/owner/repo.git")
+	fmt.Println("  secrethawk git ./repo --history --format sarif")
+	fmt.Println("  secrethawk version")
+	fmt.Println("")
+	fmt.Println("Run 'secrethawk <command> --help' for command-specific help.")
+}
+
+func printScanHelp() {
+	fmt.Println("Usage:")
+	fmt.Println("  secrethawk scan [path] [options]")
+	fmt.Println("")
+	fmt.Println("Options:")
+	fmt.Println("  --format <format>       text, json, or sarif")
+	fmt.Println("  --fail-on-secret        exit with status 1 when findings exist")
+	fmt.Println("  -h, --help              show this help")
+}
+
+func printGitHelp() {
+	fmt.Println("Usage:")
+	fmt.Println("  secrethawk git <path-or-url> [options]")
+	fmt.Println("")
+	fmt.Println("Options:")
+	fmt.Println("  --history               scan Git commit history and diffs")
+	fmt.Println("  --format <format>       text, json, or sarif")
+	fmt.Println("  --fail-on-secret        exit with status 1 when findings exist")
+	fmt.Println("  -h, --help              show this help")
+	fmt.Println("")
+	fmt.Println("Examples:")
+	fmt.Println("  secrethawk git ./repo")
+	fmt.Println("  secrethawk git https://github.com/owner/repo.git")
+	fmt.Println("  secrethawk git ./repo --history")
+	fmt.Println("  secrethawk git ./repo --history --format sarif")
 }
