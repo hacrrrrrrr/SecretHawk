@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"path/filepath"
 	"fmt"
 	"os"
 
@@ -14,16 +15,29 @@ import (
 const version = "0.2.0"
 
 func main() {
-	if len(os.Args) < 2 {
+	args := os.Args[1:]
+
+	// Some Termux/Android launchers and shell wrappers can pass the
+	// executable path as argv[1]. Treat that as the program name so
+	// "secrethawk scan ..." still works instead of interpreting the
+	// binary path as a command.
+	if len(args) > 0 {
+		base := filepath.Base(args[0])
+		if base == "secrethawk" || base == "secrethawk.exe" {
+			args = args[1:]
+		}
+	}
+
+	if len(args) == 0 {
 		printHelp()
 		return
 	}
 
-	switch os.Args[1] {
+	switch args[0] {
 	case "scan":
-		runScan(os.Args[2:])
+		runScan(args[1:])
 	case "git":
-		runGit(os.Args[2:])
+		runGit(args[1:])
 	case "version", "--version", "-v":
 		fmt.Println("SecretHawk", version)
 	case "help", "--help", "-h":
