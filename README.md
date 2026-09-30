@@ -1,71 +1,208 @@
 # 🦅 SecretHawk
 
+**Sponsorship & inquiries:** **hunterkritik@gmail.com**
+
 Fast, extensible secret scanning for source trees and Git repositories.
 
 > Find exposed credentials before they become incidents.
 
-## Features
+[![CI](https://github.com/hacrrrrrrr/SecretHawk/actions/workflows/ci.yml/badge.svg)](https://github.com/hacrrrrrrr/SecretHawk/actions/workflows/ci.yml)
+[![Go](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go)](https://go.dev/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-- Regex-based secret detection
-- Recursive filesystem scanning
-- Git-aware directory handling
-- Secret redaction
-- JSON and terminal output
-- Severity and confidence scoring
-- Go API under `pkg/`
-- CI-friendly `--fail-on-secret`
+---
 
-## Project layout
+## Overview
 
-```
-cmd/          CLI
-internal/     scanner implementation
-pkg/          public Go API
-assets/       bundled/static assets
-docs/         architecture and security documentation
-examples/     safe usage examples
-proto/        future service/API definitions
-scripts/      build and test helpers
-```
+SecretHawk is a defensive secret-scanning toolkit designed to help developers and security teams identify accidentally exposed credentials in source code and repositories.
+
+It is designed around a simple principle:
+
+**detect early, redact safely, and make findings useful.**
+
+SecretHawk does not contact external services or attempt to validate discovered credentials by default.
+
+## Highlights
+
+- 🔎 Recursive source-tree scanning
+- 🔐 Provider-specific secret detectors
+- 🧬 Entropy-analysis primitives
+- 🧹 Finding deduplication
+- 🎭 Redacted findings
+- 📊 Severity and confidence metadata
+- 📄 Terminal and JSON output
+- 🛡️ SARIF output foundation
+- 🚦 CI-friendly failure mode
+- 🧪 Unit tests, fuzz tests and benchmarks
+- 📦 Public Go API
+- 🧩 Extensible architecture
 
 ## Quick start
 
-```bash
-go run ./cmd/secrethawk scan .
-go run ./cmd/secrethawk scan . --format json
-go run ./cmd/secrethawk scan . --fail-on-secret
-```
-
-Build with:
+### Build
 
 ```bash
+git clone https://github.com/hacrrrrrrr/SecretHawk.git
+cd SecretHawk
 make build
 ```
 
-Test with:
+### Scan the current directory
+
+```bash
+go run ./cmd/secrethawk scan .
+```
+
+### JSON output
+
+```bash
+go run ./cmd/secrethawk scan . --format json
+```
+
+### CI mode
+
+```bash
+go run ./cmd/secrethawk scan . --fail-on-secret
+```
+
+## Example finding
+
+SecretHawk intentionally avoids printing complete credential material:
+
+```text
+[HIGH] aws-access-key (96%) config/app.env:42 AKIA••••••••••••EF
+```
+
+The exact secret value is not exposed in normal output.
+
+## Project structure
+
+```text
+SecretHawk/
+├── cmd/                 # CLI applications
+├── internal/
+│   ├── detector/        # Detection logic
+│   ├── model/           # Finding models
+│   ├── output/          # Output renderers
+│   └── scanner/         # Scanning and analysis engine
+├── pkg/                 # Public Go API
+├── assets/              # Static/bundled assets
+├── docs/                # Architecture and project documentation
+├── examples/             # Safe usage examples
+├── proto/               # Future API/service definitions
+├── scripts/             # Build/test helpers
+├── .github/workflows/   # Continuous integration
+├── Makefile
+└── go.mod
+```
+
+## Detection architecture
+
+```text
+Source / Repository
+       │
+       ▼
+ File discovery
+       │
+       ▼
+ Normalization
+       │
+       ▼
+ Detector engine
+ ┌─────┴──────────┐
+ │ Regex          │
+ │ Entropy        │
+ │ Provider rules │
+ └─────┬──────────┘
+       ▼
+ Deduplication
+       │
+       ▼
+ Severity / confidence
+       │
+       ├── Terminal
+       ├── JSON
+       └── SARIF
+```
+
+## Development
+
+Run tests:
 
 ```bash
 make test
+```
+
+Run static analysis:
+
+```bash
 make vet
 ```
 
+Run everything used by the local test helper:
+
+```bash
+./scripts/test.sh
+```
+
+Build an optimized binary:
+
+```bash
+./scripts/build.sh
+```
+
+## Security model
+
+SecretHawk is intended for systems and repositories you are authorized to inspect.
+
+By design:
+
+- detected values are redacted in normal output;
+- credentials are not transmitted to third-party services;
+- credential validation is disabled by default;
+- examples use synthetic values;
+- security reports should avoid including live credentials.
+
+See **[SECURITY.md](SECURITY.md)** for reporting and responsible-disclosure guidance.
+
 ## Roadmap
 
-- Git history scanning
-- Entropy-assisted detection
-- SARIF output
-- Configurable detector packs
-- Baselines and allowlists
-- Parallel scanning and incremental cache
-- Fuzzing and benchmarks
-- Optional service/API layer
+### Current
 
-## Security
+- [x] Recursive filesystem scanning
+- [x] Regex detectors
+- [x] Secret redaction
+- [x] JSON output
+- [x] Entropy primitives
+- [x] Deduplication
+- [x] SARIF foundation
+- [x] Fuzz/benchmark coverage
 
-Use SecretHawk only on repositories and systems you are authorized to inspect. Detected credentials are not contacted or validated by default.
+### Next
 
-See [docs/threat-model.md](docs/threat-model.md).
+- [ ] Git history scanning
+- [ ] Baselines and allowlists
+- [ ] .gitignore-aware traversal
+- [ ] Parallel worker pool
+- [ ] Config file
+- [ ] Detector packs
+- [ ] Incremental scanning cache
+- [ ] Improved false-positive suppression
+- [ ] Large-repository performance suite
+- [ ] Expanded SARIF rules/locations
+
+## Sponsorship & collaboration
+
+SecretHawk is an independent security tooling project.
+
+For **sponsorship, collaboration, research inquiries, or project-related questions**:
+
+**hunterkritik@gmail.com**
+
+Please do not send real credentials or other sensitive secrets in email.
 
 ## License
 
-Apache-2.0
+SecretHawk is released under the **Apache License 2.0**.
+
+See [LICENSE](LICENSE) for details.
