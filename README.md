@@ -37,33 +37,110 @@ SecretHawk does not contact external services or attempt to validate discovered 
 - 📦 Public Go API
 - 🧩 Extensible architecture
 
-## Quick start
+## Installation
 
-### Build
+### From source
+
+Requirements:
+
+- Go 1.23+
+- Git (required for `secrethawk git`)
+
+Clone and build:
 
 ```bash
 git clone https://github.com/hacrrrrrrr/SecretHawk.git
 cd SecretHawk
-make build
+go build -o secrethawk ./cmd/secrethawk
 ```
 
-### Scan the current directory
+Install into your Go binary directory:
 
 ```bash
-go run ./cmd/secrethawk scan .
+go install github.com/hacrrrrrrr/SecretHawk/cmd/secrethawk@latest
+```
+
+Then verify:
+
+```bash
+secrethawk version
+secrethawk --help
+```
+
+### Download a release
+
+When release binaries are published, download the archive for your operating system and architecture from the project's **Releases** page, extract it, and place the `secrethawk` binary somewhere on your `PATH`.
+
+## Usage
+
+### Scan a directory
+
+```bash
+secrethawk scan .
+```
+
+Scan a specific source tree:
+
+```bash
+secrethawk scan ./src
 ```
 
 ### JSON output
 
 ```bash
-go run ./cmd/secrethawk scan . --format json
+secrethawk scan . --format json
 ```
 
-### CI mode
+### SARIF output
 
 ```bash
-go run ./cmd/secrethawk scan . --fail-on-secret
+secrethawk scan . --format sarif > results.sarif
 ```
+
+### CI failure mode
+
+```bash
+secrethawk scan . --fail-on-secret
+```
+
+The command exits with status `1` when findings are detected.
+
+### Scan a local Git repository
+
+```bash
+secrethawk git ./my-repository
+```
+
+### Scan a public or authorized remote Git repository
+
+```bash
+secrethawk git https://github.com/owner/repository.git
+```
+
+SecretHawk uses the local Git executable to clone the repository into a temporary directory. The temporary checkout is removed after scanning.
+
+### Scan Git history
+
+```bash
+secrethawk git ./my-repository --history
+```
+
+History scanning examines commit diffs for supported secret patterns and reports redacted findings.
+
+### Remote private repositories
+
+SecretHawk does not ask for or transmit GitHub credentials. Configure your normal Git credential helper or SSH authentication first, then run the Git command normally.
+
+Only scan repositories you are authorized to access.
+
+### Command help
+
+```bash
+secrethawk --help
+secrethawk scan --help
+secrethawk git --help
+```
+
 
 ## Example finding
 
