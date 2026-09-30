@@ -31,7 +31,7 @@ SecretHawk does not contact external services or attempt to validate discovered 
 - 🎭 Redacted findings
 - 📊 Severity and confidence metadata
 - 📄 Terminal and JSON output
-- 🛡️ SARIF output foundation
+- 🛡️ SARIF output with locations
 - 🚦 CI-friendly failure mode
 - 🧪 Unit tests, fuzz tests and benchmarks
 - 📦 Public Go API
@@ -257,7 +257,7 @@ See **[SECURITY.md](SECURITY.md)** for reporting and responsible-disclosure guid
 
 ### Next
 
-- [ ] Git history scanning
+- [x] Git history scanning
 - [ ] Baselines and allowlists
 - [ ] .gitignore-aware traversal
 - [ ] Parallel worker pool
