@@ -60,6 +60,14 @@ Install into your Go binary directory:
 go install github.com/hacrrrrrrr/SecretHawk/cmd/secrethawk@latest
 ```
 
+### Roadmap features
+
+```bash
+secrethawk scan . --config .secrethawk.json --baseline .secrethawk-baseline.json --fail-on-secret
+secrethawk scan . --update-baseline --baseline .secrethawk-baseline.json
+```
+```
+
 Then verify:
 
 ```bash
@@ -244,6 +252,8 @@ See **[SECURITY.md](SECURITY.md)** for reporting and responsible-disclosure guid
 
 ## Roadmap
 
+### Current release: v0.4.0
+
 ### Current
 
 - [x] Recursive filesystem scanning
@@ -255,18 +265,19 @@ See **[SECURITY.md](SECURITY.md)** for reporting and responsible-disclosure guid
 - [x] SARIF foundation
 - [x] Fuzz/benchmark coverage
 
-### Next
+### v0.4 completed
 
 - [x] Git history scanning
-- [ ] Baselines and allowlists
-- [ ] .gitignore-aware traversal
-- [ ] Parallel worker pool
-- [ ] Config file
-- [ ] Detector packs
-- [ ] Incremental scanning cache
-- [ ] Improved false-positive suppression
-- [ ] Large-repository performance suite
-- [ ] Expanded SARIF rules/locations
+- [x] Baselines and allowlists
+- [x] .gitignore-aware traversal
+- [x] Parallel worker pool
+- [x] JSON config file
+- [x] Detector packs
+- [x] Incremental scanning cache
+- [x] Improved false-positive suppression
+- [x] CI integration with SARIF upload
+- [x] Large-repository benchmark suite
+- [x] Expanded SARIF rules and source locations
 
 ## Sponsorship & collaboration
 
