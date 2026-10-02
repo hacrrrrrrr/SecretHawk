@@ -1,23 +1,43 @@
 # SecretHawk Architecture
 
-SecretHawk is organized around a small scanning pipeline:
+SecretHawk uses a deterministic, local-first scanning pipeline:
 
-1. **CLI** parses commands and output options.
-2. **Scanner** walks authorized source trees and streams text files.
-3. **Detectors** identify provider-specific and generic secret patterns.
-4. **Model** normalizes findings.
-5. **Output** renders terminal or JSON results.
+```
+source / repository
+       |
+       +--> .gitignore filtering
+       |
+       +--> incremental cache lookup
+       |
+       v
+parallel file workers
+       |
+       +--> provider regex rules
+       +--> detector packs
+       +--> entropy analysis
+       |
+       v
+confidence + placeholder suppression
+       |
+       +--> baseline suppression
+       |
+       v
+deduplication
+       |
+       +--> text
+       +--> JSON
+       +--> SARIF
+```
 
-## Design goals
+## Components
 
-- Keep detectors independent and testable.
-- Never print complete detected credentials.
-- Avoid network validation by default.
-- Make CI integration deterministic.
-- Keep public APIs small while allowing internal implementation changes.
+- **CLI** — command parsing, configuration, baseline/cache controls and CI exit codes.
+- **Scanner** — file discovery, worker pool, size limits, cache integration and deterministic result ordering.
+- **Git integration** — local/remote checkout plus commit-diff history scanning.
+- **Detector registry** — built-in provider rules plus JSON detector packs.
+- **Baseline** — stable fingerprints for intentionally accepted findings.
+- **Cache** — file metadata and finding reuse for unchanged files.
+- **Output** — redacted terminal/JSON output and SARIF 2.1.0 rule/location metadata.
+- **Public API** — small Go API for embedding scans in other applications.
 
-## Planned pipeline
-
-`filesystem -> git/history -> normalization -> detectors -> scoring -> deduplication -> output`
-
-Future releases will add Git history scanning, entropy scoring, SARIF, baselines and configurable detector packs.
+All detection is local by default. SecretHawk does not validate credentials against their providers.
