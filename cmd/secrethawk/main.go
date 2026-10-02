@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/hacrrrrrrr/SecretHawk/internal/baseline"
 	"github.com/hacrrrrrrr/SecretHawk/internal/cache"
@@ -129,7 +128,7 @@ func runGit(args []string) {
 	if err != nil { fmt.Fprintln(os.Stderr, "error:", err); os.Exit(1) }
 
 	if *history {
-		hf, err := scanner.ScanHistory(repo)
+		hf, err := scanner.ScanHistoryWithOptions(repo, opts)
 		if err != nil { fmt.Fprintln(os.Stderr, "history error:", err); os.Exit(1) }
 		findings = scanner.Deduplicate(append(findings, hf...))
 	}
@@ -213,5 +212,3 @@ func printGitHelp() {
 	fmt.Println("  --fail-on-secret             exit 1 when findings exist")
 	fmt.Println("  -h, --help                   show git help")
 }
-
-var _ = runtime.NumCPU
