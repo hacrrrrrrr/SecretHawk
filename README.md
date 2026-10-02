@@ -66,7 +66,6 @@ go install github.com/hacrrrrrrr/SecretHawk/cmd/secrethawk@latest
 secrethawk scan . --config .secrethawk.json --baseline .secrethawk-baseline.json --fail-on-secret
 secrethawk scan . --update-baseline --baseline .secrethawk-baseline.json
 ```
-```
 
 Then verify:
 
