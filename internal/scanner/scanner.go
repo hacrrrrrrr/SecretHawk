@@ -2,6 +2,9 @@ package scanner
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -119,7 +122,7 @@ func scanFile(path string, opts Options, active []detector.Rule) ([]model.Findin
 		return nil, fmt.Errorf("file %s exceeds maximum scan size of %d bytes", path, opts.MaxFileSize)
 	}
 	if opts.Cache != nil {
-		if cached, ok := opts.Cache.Get(path, info.Size(), info.ModTime().UnixNano()); ok {
+		if cached, ok := opts.Cache.Get(path, info.Size(), info.ModTime().UnixNano(), optionsKey(opts)); ok {
 			return cached, nil
 		}
 	}
@@ -139,7 +142,7 @@ func scanFile(path string, opts Options, active []detector.Rule) ([]model.Findin
 		findings = append(findings, entropyFinding(path, line, text, opts.EntropyThreshold)...)
 	}
 	if err := sc.Err(); err != nil { return nil, err }
-	if opts.Cache != nil { opts.Cache.Put(path, info.Size(), info.ModTime().UnixNano(), findings) }
+	if opts.Cache != nil { opts.Cache.Put(path, info.Size(), info.ModTime().UnixNano(), optionsKey(opts), findings) }
 	return findings, nil
 }
 
@@ -173,3 +176,25 @@ func shouldSkipWithOptions(path string, opts Options) bool {
 }
 
 func okBase(pattern, path string) bool { return filepath.Base(path) == pattern }
+
+
+func optionsKey(opts Options) string {
+	type key struct {
+		MaxFileSize int64
+		Workers int
+		ConfidenceThreshold int
+		IgnorePaths []string
+		IgnoreExtensions []string
+		DisabledDetectors []string
+		DetectorPacks []string
+		EntropyThreshold float64
+	}
+	data, _ := json.Marshal(key{
+		MaxFileSize:opts.MaxFileSize, Workers:opts.Workers,
+		ConfidenceThreshold:opts.ConfidenceThreshold, IgnorePaths:opts.IgnorePaths,
+		IgnoreExtensions:opts.IgnoreExtensions, DisabledDetectors:opts.DisabledDetectors,
+		DetectorPacks:opts.DetectorPacks, EntropyThreshold:opts.EntropyThreshold,
+	})
+	h := sha256.Sum256(data)
+	return hex.EncodeToString(h[:])
+}
