@@ -14,6 +14,7 @@ type Entry struct {
 	Size    int64           `json:"size"`
 	ModTime int64           `json:"mod_time"`
 	SHA256  string          `json:"sha256"`
+	ConfigKey string        `json:"config_key"`
 	Findings []model.Finding `json:"findings"`
 }
 
@@ -35,16 +36,16 @@ func Load(path string) (*Store, error) {
 	return s, nil
 }
 
-func (s *Store) Get(path string, size, modTime int64) ([]model.Finding, bool) {
+func (s *Store) Get(path string, size, modTime int64, configKey string) ([]model.Finding, bool) {
 	s.mu.Lock(); defer s.mu.Unlock()
 	e, ok := s.Entries[path]
-	if !ok || e.Size != size || e.ModTime != modTime { return nil, false }
+	if !ok || e.Size != size || e.ModTime != modTime || e.ConfigKey != configKey { return nil, false }
 	return append([]model.Finding(nil), e.Findings...), true
 }
 
-func (s *Store) Put(path string, size, modTime int64, findings []model.Finding) {
+func (s *Store) Put(path string, size, modTime int64, configKey string, findings []model.Finding) {
 	s.mu.Lock(); defer s.mu.Unlock()
-	s.Entries[path] = Entry{Size:size, ModTime:modTime, SHA256: hashFindings(findings), Findings:append([]model.Finding(nil), findings...)}
+	s.Entries[path] = Entry{Size:size, ModTime:modTime, ConfigKey:configKey, SHA256: hashFindings(findings), Findings:append([]model.Finding(nil), findings...)}
 }
 
 func (s *Store) Save() error {
