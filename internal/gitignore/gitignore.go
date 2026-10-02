@@ -29,7 +29,9 @@ func New(root string) *Matcher {
 
 func (m *Matcher) Ignored(path string, isDir bool) bool {
 	if m.gitRepo {
-		cmd := exec.Command("git", "-C", m.root, "check-ignore", "-q", "--", path)
+		rel, err := filepath.Rel(m.root, path)
+		if err != nil { return false }
+		cmd := exec.Command("git", "-C", m.root, "check-ignore", "-q", "--", filepath.ToSlash(rel))
 		return cmd.Run() == nil
 	}
 	rel, err := filepath.Rel(m.root, path)
