@@ -7,3 +7,5 @@ coverage.html
 .DS_Store
 .idea/
 .vscode/
+
+.secrethawk-cache.json
