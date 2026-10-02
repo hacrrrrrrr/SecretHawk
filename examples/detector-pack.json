@@ -1,0 +1,11 @@
+{
+  "name": "example-provider-pack",
+  "rules": [
+    {
+      "name": "example-service-key",
+      "pattern": "\\bEXAMPLE_[A-Z0-9]{24}\\b",
+      "severity": "HIGH",
+      "confidence": 90
+    }
+  ]
+}
