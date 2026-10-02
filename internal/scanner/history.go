@@ -12,6 +12,15 @@ import (
 )
 
 func ScanHistory(repo string) ([]model.Finding, error) {
+	return ScanHistoryWithOptions(repo, DefaultOptions())
+}
+
+func ScanHistoryWithOptions(repo string, opts Options) ([]model.Finding, error) {
+	active := detector.DefaultRules()
+	packs, err := detector.LoadPacks(opts.DetectorPacks)
+	if err != nil { return nil, err }
+	active = detector.FilterRules(append(active, packs...), opts.DisabledDetectors)
+
 	commits, err := gitx.History(repo)
 	if err != nil { return nil, err }
 
@@ -25,9 +34,11 @@ func ScanHistory(repo string) ([]model.Finding, error) {
 			line++
 			text := sc.Text()
 			if !strings.HasPrefix(text, "+") || strings.HasPrefix(text, "+++") { continue }
-			findings = append(findings, detector.ScanLine("commit:"+commit, line, strings.TrimPrefix(text, "+"))...)
+			text = strings.TrimPrefix(text, "+")
+			findings = append(findings, detector.ScanLineWithRules("commit:"+commit, line, text, active)...)
+			if opts.EntropyThreshold > 0 { findings = append(findings, entropyFinding("commit:"+commit, line, text, opts.EntropyThreshold)...)}
 		}
 		if err := sc.Err(); err != nil { return findings, fmt.Errorf("history scan: %w", err) }
 	}
-	return Deduplicate(findings), nil
+	return filterFindings(Deduplicate(findings), opts), nil
 }
